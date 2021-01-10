@@ -1,0 +1,27 @@
+# 应用服务 WEB 访问端口
+server:
+    port: 8080
+# 应用名称
+spring:
+    application:
+        name: springboot-activiti-processes
+    # activiti
+    activiti:
+        #每次应用启动不检查Activiti数据表是否存在及版本号是否匹配，提升应用启动速度
+        database-schema-update: true
+        check-process-definitions: true
+        process-definition-location-prefix: classpath:/processes/
+        process-definition-location-suffixes:
+            -**.bpmn
+            -**.bpmn20.xml
+        #保存历史数据级别设置为full最高级别，便于历史数据的追溯
+        history-level: full
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://146.56.192.87:3306/activiti_demo?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC&nullCatalogMeansCurrent=true
+        jdbc-url: jdbc:mysql://146.56.192.87:3306/activiti_demo?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC&nullCatalogMeansCurrent=true
+        username: oyc
+        password: 111111
+        driver-class-name: com.mysql.cj.jdbc.Driver
+
+
