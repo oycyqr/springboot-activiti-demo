@@ -70,7 +70,7 @@ public class ActivitiLeaveController {
                 .addClasspathResource("processes/leave.bpmn")
                 // 图片文件
                 .addClasspathResource("processes/leave.png")
-                .name("离职申请流程1.0.1")
+                .name("离职申请流程1.0.1").key("leave")
                 .deploy();
         System.out.println("流程部署id:" + deployment.getId());
         System.out.println("流程部署名称:" + deployment.getName());
@@ -97,7 +97,7 @@ public class ActivitiLeaveController {
                 .singleResult();
         //是否存在
         if (deployment == null) {
-            return ResponseEntity.ok(String.format("流程定义：%s 不存在", deployment));
+            return ResponseEntity.ok(String.format("流程定义：%s 不存在", deploymentId));
         }
         repositoryService.deleteDeployment(deploymentId);
         //级联删除,会删除所有运行中与之关联的流程、任务等内容
