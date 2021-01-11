@@ -6,7 +6,8 @@ spring:
   activiti:
     #每次应用启动不检查Activiti数据表是否存在及版本号是否匹配，提升应用启动速度
     database-schema-update: true
-    check-process-definitions: true
+    #在项目单独作为一个引擎，本身不部署流程的时候，如果resources目录没有“processes”目录，启动项目报错–找不到processes目录。需要在配置文件中添加以下内容：
+    check-process-definitions: false
     process-definition-location-prefix: classpath:/processes/
     process-definition-location-suffixes:
       -**.bpmn
@@ -18,7 +19,7 @@ spring:
     url: jdbc:mysql://146.56.192.87:3306/activiti_demo?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC&nullCatalogMeansCurrent=true
     jdbc-url: jdbc:mysql://146.56.192.87:3306/activiti_demo?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC&nullCatalogMeansCurrent=true
     username: oyc
-    password: 111111
+    password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
 # 应用服务 WEB 访问端口
 server:
