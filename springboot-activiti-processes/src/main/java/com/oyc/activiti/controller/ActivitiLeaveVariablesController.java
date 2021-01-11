@@ -40,8 +40,8 @@ import java.util.Map;
  * @Version 1.0
  */
 @RestController
-@RequestMapping("leave")
-public class ActivitiLeaveController {
+@RequestMapping("leaveVal")
+public class ActivitiLeaveVariablesController {
 
     @Resource
     private RepositoryService repositoryService;
@@ -67,10 +67,10 @@ public class ActivitiLeaveController {
         //部署对象
         Deployment deployment = repositoryService.createDeployment()
                 // bpmn文件
-                .addClasspathResource("processes/leave.bpmn")
+                .addClasspathResource("processes/leaveVal.bpmn")
                 // 图片文件
-                .addClasspathResource("processes/leave.png")
-                .name("离职申请流程1.0.1").key("leave")
+                //.addClasspathResource("processes/leave.png")
+                .name("离职申请流程1.0.2").key("leaveVal")
                 .deploy();
         System.out.println("流程部署id:" + deployment.getId());
         System.out.println("流程部署名称:" + deployment.getName());
@@ -104,6 +104,34 @@ public class ActivitiLeaveController {
         //repositoryService.deleteDeployment(deploymentId,true);
         return ResponseEntity.ok(String.format("流程定义：%s 删除成功", deploymentId));
     }
+    /**
+     * 1 启动流程时设置流程变量
+     * 2 办理任务时设置流程变量
+     * 3 通过当前流程实例设置
+     * 4 通过当前任务设置
+     */
+    /**
+     * 启动离职申请流程--传入离职申请流程的key
+     */
+    @GetMapping("startVal")
+    public ResponseEntity startProcessAndSetValByKey(@RequestParam String processesKey) {
+        HashMap<String, Object> resultMap = new HashMap<>(8);
+        // 定义流程变量
+        Map<String, Object> variables = new HashMap<String, Object>();
+        //变量名是president，变量值是oyc,变量名也可以是一个对象
+        variables.put("president", "oyc");
+        //启动流程并设置变量
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processesKey, variables);
+
+        resultMap.put("id", processInstance.getId());
+        resultMap.put("name", processInstance.getName());
+        resultMap.put("deploymentId", processInstance.getDeploymentId());
+        resultMap.put("processDefinitionId", processInstance.getProcessDefinitionId());
+        resultMap.put("startUserId", processInstance.getStartUserId());
+        resultMap.put("processDefinitionName", processInstance.getProcessDefinitionName());
+        return ResponseEntity.ok(resultMap);
+    }
+
 
     /**
      * 启动离职申请流程--传入离职申请流程的key
@@ -227,8 +255,62 @@ public class ActivitiLeaveController {
      */
     @GetMapping("completeTask")
     public ResponseEntity completeTaskById(@RequestParam String taskId) {
-        taskService.complete(taskId);
+        // 定义流程变量
+        Map<String, Object> variables = new HashMap<String, Object>();
+        //变量名是president，变量值是oyc,变量名也可以是一个对象
+        variables.put("president", "oyc");
+        //完成任务并设置变量
+        taskService.complete(taskId, variables);
         return ResponseEntity.ok(String.format("任务id为：%s 已经完成", taskId));
+    }
+
+    /**
+     * @param processInstanceId 当前流程实例执行 id，通常设置为当前执行的流程实例,必须当前未结束 流程实例的执行 id，通常此 id 设置流程实例 的 id。
+     * @return
+     * @throws
+     * @Description: 通过流程实例 id 设置全局变量，该流程实例必须未执行完成。
+     */
+    @GetMapping("setGlobalVariableByProcessInstanceId")
+    public void setGlobalVariableByExecutionId(@RequestParam String processInstanceId) {
+        //通过流程实例id 设置流程变量-单个值
+        runtimeService.setVariable(processInstanceId, "president", "zhangqiang");
+        Object president = runtimeService.getVariable(processInstanceId, "president");
+        System.out.println("1流程实例变量-president：" + president);
+
+        // 定义流程变量
+        Map<String, Object> variables = new HashMap<String, Object>();
+        //变量名是president，变量值是oyc,变量名也可以是一个对象
+        variables.put("president", "oyc");
+        variables.put("president1", "oyc1");
+
+        //一次设置多个值
+        runtimeService.setVariables(processInstanceId, variables);
+        president = runtimeService.getVariable(processInstanceId, "president");
+        System.out.println("2流程实例变量-president：" + president);
+    }
+
+    /**
+     * @param taskId 当前待办任务id
+     * @return
+     * @throws 注意：任务id必须是当前待办任务id，act_ru_task中存在。如果该任务已结束，报错：
+     * @Description: 通过当前任务设置
+     */
+    @GetMapping("setGlobalVariableByTaskId")
+    public void setGlobalVariableByTaskId(@RequestParam String taskId) {
+        TaskService taskService = processEngine.getTaskService();
+        // 定义流程变量
+        Map<String, Object> variables = new HashMap<String, Object>();
+        //变量名是president，变量值是oyc,变量名也可以是一个对象
+        variables.put("president", "oyc");
+        variables.put("president1", "oyc1");
+        //通过任务设置流程变量
+        taskService.setVariable(taskId, "president", "president");
+        Object president = taskService.getVariable(taskId, "president");
+        System.out.println("1流程实例变量-president：" + president);
+        //一次设置多个值
+        taskService.setVariables(taskId, variables);
+        president = taskService.getVariable(taskId, "president");
+        System.out.println("2流程实例变量-president：" + president);
     }
 
     /**
@@ -268,7 +350,7 @@ public class ActivitiLeaveController {
      * 查询历史任务
      *
      * @param processDefinitionKey 流程定义key
-     * @param processInstanceId 流程实例id
+     * @param processInstanceId    流程实例id
      * @return
      * @throws
      */
