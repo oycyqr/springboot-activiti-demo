@@ -147,7 +147,7 @@ public class ActivitiTaskController {
     }
 
     /**
-     * 根据任务id委派给指定用户
+     * 根据任务id委派（转派、转交）给指定用户
      *
      * @param taskId 任务id
      * @param userName 用户名称
@@ -157,7 +157,7 @@ public class ActivitiTaskController {
     @GetMapping("assigneeTask")
     public ResponseEntity assigneeTaskById(@RequestParam String taskId, @RequestParam String userName) {
         taskService.setAssignee(taskId, userName);
-        return ResponseEntity.ok(String.format("任务id为：%s 已经委派给 %s", taskId, userName));
+        return ResponseEntity.ok(String.format("任务id为：%s 已经委派（转派、转交）给 %s", taskId, userName));
     }
 
 
