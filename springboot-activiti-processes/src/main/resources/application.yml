@@ -21,7 +21,7 @@ spring:
         url: jdbc:mysql://146.56.192.87:3306/activiti_demo?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC&nullCatalogMeansCurrent=true
         jdbc-url: jdbc:mysql://146.56.192.87:3306/activiti_demo?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC&nullCatalogMeansCurrent=true
         username: oyc
-        password: 111111
+        password: 123456
         driver-class-name: com.mysql.cj.jdbc.Driver
 
 

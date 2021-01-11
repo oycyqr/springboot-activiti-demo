@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://www.activiti.org/test" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" expressionLanguage="http://www.w3.org/1999/XPath" id="m1540200341676" name="" targetNamespace="http://www.activiti.org/test" typeLanguage="http://www.w3.org/2001/XMLSchema">
-  <process id="holiday" isClosed="false" isExecutable="true" name="请假流程" processType="None">
+  <process id="leave" isClosed="false" isExecutable="true" name="离职申请流程" processType="None">
     <startEvent id="_2" name="StartEvent"/>
 
-    <userTask activiti:assignee="zhangsan" activiti:exclusive="true" id="_3" name="填写请假申请表"/>
+    <userTask activiti:assignee="zhangsan" activiti:exclusive="true" id="_3" name="填写离职申请表"/>
     <!--有四个部门经理或者秘书可以审批-->
     <userTask activiti:candidateUsers="lisi,lixiang,lisiguang,lixiao" activiti:exclusive="true" id="_4" name="部门经理审批"/>
     <userTask activiti:assignee="wangwu" activiti:exclusive="true" id="_5" name="总经理审批"/>
@@ -16,7 +16,7 @@
     <sequenceFlow id="_10" sourceRef="_5" targetRef="_6"/>
   </process>
   <bpmndi:BPMNDiagram documentation="background=#FFFFFF;count=1;horizontalcount=1;orientation=0;width=842.4;height=1195.2;imageableWidth=832.4;imageableHeight=1185.2;imageableX=5.0;imageableY=5.0" id="Diagram-_1" name="New Diagram">
-    <bpmndi:BPMNPlane bpmnElement="holiday">
+    <bpmndi:BPMNPlane bpmnElement="leave">
       <bpmndi:BPMNShape bpmnElement="_2" id="Shape-_2">
         <omgdc:Bounds height="32.0" width="32.0" x="280.0" y="45.0"/>
         <bpmndi:BPMNLabel>
