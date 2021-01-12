@@ -1,0 +1,122 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>任务列表</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+<div class="form-group">
+    <label class="col-sm-1 control-label" for="userName">执行人:</label>
+    <select class="col-sm-2" id="userName" name="userName">
+        <option value="zhangsan">张三</option>
+        <option value="lisi">李四</option>
+        <option value="wangwu">王五</option>
+        <option value="zhaoliu">赵六</option>
+    </select>
+</div>
+<!--<div class="form-group">
+    <label class="col-sm-1 control-label">任务类型：</label>
+    <select class="col-sm-2" multiple>
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+    </select>
+</div>-->
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>任务ID</th>
+        <th>任务名称</th>
+        <th>任务委派人</th>
+        <th>任务创建时间</th>
+        <th>任务描述</th>
+        <th>processInstanceId</th>
+        <th>businessKey</th>
+        <th>holiday</th>
+        <th>processDefinitionId</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="task : ${taskList}">
+        <td th:text="${task.get('id')}"></td>
+        <td th:text="${task.get('name')}"></td>
+        <td th:text="${task.get('assignee')}"></td>
+        <td th:text="${task.get('createTime')}"></td>
+        <td th:text="${task.get('description')}"></td>
+        <td th:text="${task.get('processInstanceId')}"></td>
+        <td th:text="${task.get('businessKey')}"></td>
+        <td th:text="${task.get('holiday')}"></td>
+        <td th:text="${task.get('processDefinitionId')}"></td>
+        <td>
+            <button class="btn btn-primary btn-md"
+                    th:onclick="showInstanceInfo([[${task.get('processInstanceId')}]])">
+                查看流程执行情况
+            </button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- 流程模态框（Modal） -->
+<div class="modal fade" id="instanceInfoModal" tabindex="-1" role="dialog" aria-labelledby="instanceInfoModal"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="instanceInfoModalLabel">流程执行情况</h4>
+            </div>
+            <div class="modal-body" id="processInstanceInfo">流程执行情况。</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <!--<button type="button" class="btn btn-primary">提交更改</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:inline="javascript">
+    var ctxPath = window.location.protocol + '//' + window.location.host + '/';
+
+    $(function () {
+        $("#userName").on("change", function () {
+            console.log("userName:" + $("#userName").val());
+            getTask($("#userName").val());
+        })
+    })
+
+    function getTask(userName) {
+        $.ajax({
+            url: ctxPath + "holiday/task",
+            type: 'get',
+            data: {userName: userName},
+            dataType: "json",
+            success: function (data) {
+                console.info("data", data);
+            }
+        });
+    }
+
+    function showInstanceInfo(instanceId) {
+        $.ajax({
+            url: ctxPath + "holiday/queryHistoricActivity",
+            type: 'get',
+            data: {processInstanceId: instanceId},
+            dataType: "json",
+            success: function (data) {
+                console.info("data", data);
+                $("#processInstanceInfo").html(JSON.stringify(data));
+                $('#instanceInfoModal').modal('toggle');
+            }
+        });
+    }
+</script>
+</body>
+</html>

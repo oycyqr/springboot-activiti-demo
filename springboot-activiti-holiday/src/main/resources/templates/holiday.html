@@ -1,0 +1,85 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>请假单列表</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>标题</th>
+        <th>请假人</th>
+        <th>请假类型</th>
+        <th>请假理由</th>
+        <th>开始时间</th>
+        <th>结束时间</th>
+        <th>状态</th>
+        <th>备注</th>
+        <th>流程实例ID</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="holiday : ${holidayList}">
+        <td th:text="${holiday.getId()}"></td>
+        <td th:text="${holiday.getTitle()}"></td>
+        <td th:text="${holiday.getUserName()}"></td>
+        <td th:text="${holiday.getType()}"></td>
+        <td th:text="${holiday.getReason()}"></td>
+        <td th:text="${holiday.getStartTime()}"></td>
+        <td th:text="${holiday.getEndTime()}"></td>
+        <td th:text="${holiday.getStatus()}"></td>
+        <td th:text="${holiday.getRemark()}"></td>
+        <td th:text="${holiday.getInstanceId()}"></td>
+        <td>
+            <button class="btn btn-primary btn-md" th:onclick="showInstanceInfo([[${holiday.getInstanceId()}]])">
+                查看流程执行情况
+            </button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- 流程模态框（Modal） -->
+<div class="modal fade" id="instanceInfoModal" tabindex="-1" role="dialog" aria-labelledby="instanceInfoModal"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="instanceInfoModalLabel">流程执行情况</h4>
+            </div>
+            <div class="modal-body" id="processInstanceInfo">流程执行情况。</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <!--<button type="button" class="btn btn-primary">提交更改</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:inline="javascript">
+    var ctxPath = window.location.protocol + '//' + window.location.host + '/';
+
+    function showInstanceInfo(instanceId){
+        $.ajax({
+            url: ctxPath + "holiday/queryHistoricActivity",
+            type: 'get',
+            data: {processInstanceId: instanceId},
+            dataType: "json",
+            success: function (data) {
+                console.info("data", data);
+                $("#processInstanceInfo").html(JSON.stringify(data));
+                $('#instanceInfoModal').modal('toggle');
+            }
+        });
+    }
+</script>
+</body>
+</html>
