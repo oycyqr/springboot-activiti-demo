@@ -204,6 +204,52 @@ public class ActivitiHolidayController {
         return ResponseEntity.ok(resultMap);
     }
 
+    @RequestMapping(value="/test")
+    public String test(@RequestParam(required = false) String userName,Model model) {
+        ArrayList<Object> resultList = new ArrayList<>();
+        if(StringUtils.isBlank(userName)){
+            model.addAttribute("taskList",resultList);
+            return "holiday";
+        }
+        List<Task> taskList = taskService.createTaskQuery()
+                .processDefinitionKey("holiday")
+                //只查询该任务负责人的任务
+                .taskAssignee(userName)
+                .list();
+        taskList.forEach(task -> {
+            HashMap<String, Object> map = new HashMap<>(16);
+            System.out.println(task);
+            //任务ID
+            map.put("id", task.getId());
+            //任务名称
+            map.put("name", task.getName());
+            //任务委派人
+            map.put("assignee", task.getAssignee());
+            //任务创建时间
+            map.put("createTime", task.getCreateTime());
+            //任务描述
+            map.put("description", task.getDescription());
+            //任务对应得流程实例id  ---> 流程实例 --> 业务key  ---> holiday信息
+            map.put("processInstanceId", task.getProcessInstanceId());
+            ProcessInstance processInstance = runtimeService
+                    .createProcessInstanceQuery()
+                    .processInstanceId(task.getProcessInstanceId())
+                    .singleResult();
+            String businessKey = processInstance.getBusinessKey();
+            Holiday holiday = holidayService.queryById(Integer.parseInt(businessKey));
+            //map.put("processInstance", processInstance);
+            map.put("businessKey", businessKey);
+            map.put("holiday", holiday);
+
+            //任务对应得流程定义id
+            map.put("processDefinitionId", task.getProcessDefinitionId());
+            resultList.add(map);
+        });
+        model.addAttribute("taskList",resultList);
+
+        return "task::taskList";
+    }
+
     /**
      * 根据流程key和用户名获取待办流程
      *

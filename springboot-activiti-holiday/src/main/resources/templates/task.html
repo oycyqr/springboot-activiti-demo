@@ -42,23 +42,26 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="task : ${taskList}">
-        <td th:text="${task.get('id')}"></td>
-        <td th:text="${task.get('name')}"></td>
-        <td th:text="${task.get('assignee')}"></td>
-        <td th:text="${task.get('createTime')}"></td>
-        <td th:text="${task.get('description')}"></td>
-        <td th:text="${task.get('processInstanceId')}"></td>
-        <td th:text="${task.get('businessKey')}"></td>
-        <td th:text="${task.get('holiday')}"></td>
-        <td th:text="${task.get('processDefinitionId')}"></td>
-        <td>
-            <button class="btn btn-primary btn-md"
-                    th:onclick="showInstanceInfo([[${task.get('processInstanceId')}]])">
-                查看流程执行情况
-            </button>
-        </td>
-    </tr>
+    <div class="task-list" th:fragment="taskList">
+        <tr th:each="task : ${taskList}">
+            <td th:text="${task.get('id')}"></td>
+            <td th:text="${task.get('name')}"></td>
+            <td th:text="${task.get('assignee')}"></td>
+            <td th:text="${task.get('createTime')}"></td>
+            <td th:text="${task.get('description')}"></td>
+            <td th:text="${task.get('processInstanceId')}"></td>
+            <td th:text="${task.get('businessKey')}"></td>
+            <td th:text="${task.get('holiday')}"></td>
+            <td th:text="${task.get('processDefinitionId')}"></td>
+            <td>
+                <button class="btn btn-primary btn-md"
+                        th:onclick="showInstanceInfo([[${task.get('processInstanceId')}]])">
+                    查看流程执行情况
+                </button>
+            </td>
+        </tr>
+    </div>
+
     </tbody>
 </table>
 
@@ -93,6 +96,7 @@
     })
 
     function getTask(userName) {
+        //$('.article_type').load(url);
         $.ajax({
             url: ctxPath + "holiday/task",
             type: 'get',
@@ -100,6 +104,7 @@
             dataType: "json",
             success: function (data) {
                 console.info("data", data);
+                $(".task-list").html(data);
             }
         });
     }
