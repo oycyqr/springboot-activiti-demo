@@ -36,14 +36,13 @@
         <th>任务描述</th>
         <th>processInstanceId</th>
         <th>businessKey</th>
-        <th>holiday</th>
+        <!--<th>holiday</th>-->
         <th>processDefinitionId</th>
         <th>操作</th>
     </tr>
     </thead>
-    <tbody>
-    <div class="task-list" th:fragment="taskList">
-        <tr th:each="task : ${taskList}">
+    <tbody class="task_list_table">
+        <tr th:fragment="taskList" th:each="task : ${taskList}">
             <td th:text="${task.get('id')}"></td>
             <td th:text="${task.get('name')}"></td>
             <td th:text="${task.get('assignee')}"></td>
@@ -51,17 +50,21 @@
             <td th:text="${task.get('description')}"></td>
             <td th:text="${task.get('processInstanceId')}"></td>
             <td th:text="${task.get('businessKey')}"></td>
-            <td th:text="${task.get('holiday')}"></td>
+            <!--<td th:text="${task.get('holiday')}"></td>-->
             <td th:text="${task.get('processDefinitionId')}"></td>
             <td>
-                <button class="btn btn-primary btn-md"
-                        th:onclick="showInstanceInfo([[${task.get('processInstanceId')}]])">
-                    查看流程执行情况
+                <button class="btn btn-primary btn-md" th:onclick="showInstanceInfo([[${task.get('processInstanceId')}]])">
+                    流程详情
+                </button>
+                <button class="btn btn-primary btn-md" th:onclick="showHolidayInfo([[${task.get('businessKey')}]])">
+                    假期详情
+                </button>
+
+                <button class="btn btn-primary btn-md" th:onclick="completeTask([[${task.get('id')}]])">
+                    完成任务
                 </button>
             </td>
         </tr>
-    </div>
-
     </tbody>
 </table>
 
@@ -89,32 +92,47 @@
     var ctxPath = window.location.protocol + '//' + window.location.host + '/';
 
     $(function () {
+        //初始化
+        getTask($("#userName").val());
+
+        //选则用户时查询用户的任务
         $("#userName").on("change", function () {
-            console.log("userName:" + $("#userName").val());
             getTask($("#userName").val());
         })
-    })
+    });
 
     function getTask(userName) {
-        //$('.article_type').load(url);
+        var url = ctxPath + "holiday/getTaskByUserName?userName=" + userName;
+        $('.task_list_table').load(url);
+    }
+
+    function completeTask(taskId) {
         $.ajax({
-            url: ctxPath + "holiday/task",
+            url: ctxPath + "holiday/completeTask?taskId="+taskId,
             type: 'get',
-            data: {userName: userName},
-            dataType: "json",
             success: function (data) {
                 console.info("data", data);
-                $(".task-list").html(data);
+                getTask($("#userName").val());
             }
         });
     }
 
+    function showHolidayInfo(holidayId) {
+        $.ajax({
+            url: ctxPath + "holiday/queryHolidayById/"+holidayId,
+            type: 'get',
+            success: function (data) {
+                console.info("data", data);
+                $("#processInstanceInfo").html(JSON.stringify(data));
+                $('#instanceInfoModal').modal('toggle');
+            }
+        });
+    }
     function showInstanceInfo(instanceId) {
         $.ajax({
             url: ctxPath + "holiday/queryHistoricActivity",
             type: 'get',
             data: {processInstanceId: instanceId},
-            dataType: "json",
             success: function (data) {
                 console.info("data", data);
                 $("#processInstanceInfo").html(JSON.stringify(data));

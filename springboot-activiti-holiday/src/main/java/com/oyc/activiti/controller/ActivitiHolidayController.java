@@ -23,10 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
@@ -89,6 +86,13 @@ public class ActivitiHolidayController {
         });
         model.addAttribute("holidayList", holidayList);
         return "holiday";
+    }
+
+    @GetMapping("queryHolidayById/{holidayId}")
+    @ResponseBody
+    public Holiday queryHolidayById(@PathVariable Integer holidayId) {
+        Holiday holiday = holidayService.queryById(holidayId);
+        return holiday;
     }
 
     @ResponseBody
@@ -181,7 +185,7 @@ public class ActivitiHolidayController {
         Holiday holiday = new Holiday();
         holiday.setTitle("小李的请假单");
         holiday.setUserName("小李");
-        holiday.setReason("世界那么多，我想去看看！");
+        holiday.setReason("世界那么大，我想去看看！");
         holiday.setRemark("备注");
         holiday.setStartTime(DateUtils.addDays(new Date(), 1));
         holiday.setEndTime(DateUtils.addDays(new Date(), 4));
@@ -204,50 +208,11 @@ public class ActivitiHolidayController {
         return ResponseEntity.ok(resultMap);
     }
 
-    @RequestMapping(value="/test")
-    public String test(@RequestParam(required = false) String userName,Model model) {
+    @RequestMapping(value = "/task")
+    public String task(Model model) {
         ArrayList<Object> resultList = new ArrayList<>();
-        if(StringUtils.isBlank(userName)){
-            model.addAttribute("taskList",resultList);
-            return "holiday";
-        }
-        List<Task> taskList = taskService.createTaskQuery()
-                .processDefinitionKey("holiday")
-                //只查询该任务负责人的任务
-                .taskAssignee(userName)
-                .list();
-        taskList.forEach(task -> {
-            HashMap<String, Object> map = new HashMap<>(16);
-            System.out.println(task);
-            //任务ID
-            map.put("id", task.getId());
-            //任务名称
-            map.put("name", task.getName());
-            //任务委派人
-            map.put("assignee", task.getAssignee());
-            //任务创建时间
-            map.put("createTime", task.getCreateTime());
-            //任务描述
-            map.put("description", task.getDescription());
-            //任务对应得流程实例id  ---> 流程实例 --> 业务key  ---> holiday信息
-            map.put("processInstanceId", task.getProcessInstanceId());
-            ProcessInstance processInstance = runtimeService
-                    .createProcessInstanceQuery()
-                    .processInstanceId(task.getProcessInstanceId())
-                    .singleResult();
-            String businessKey = processInstance.getBusinessKey();
-            Holiday holiday = holidayService.queryById(Integer.parseInt(businessKey));
-            //map.put("processInstance", processInstance);
-            map.put("businessKey", businessKey);
-            map.put("holiday", holiday);
-
-            //任务对应得流程定义id
-            map.put("processDefinitionId", task.getProcessDefinitionId());
-            resultList.add(map);
-        });
-        model.addAttribute("taskList",resultList);
-
-        return "task::taskList";
+        model.addAttribute("taskList", resultList);
+        return "task";
     }
 
     /**
@@ -255,12 +220,12 @@ public class ActivitiHolidayController {
      *
      * @param userName 用户名(zhangsan)
      */
-    @GetMapping("task")
-    public String getTaskByUserName(@RequestParam(required = false) String userName,Model model) {
+    @GetMapping("getTaskByUserName")
+    public String getTaskByUserName(@RequestParam(required = false) String userName, Model model) {
         ArrayList<Object> resultList = new ArrayList<>();
-        if(StringUtils.isBlank(userName)){
-            model.addAttribute("taskList",resultList);
-            return "holiday";
+        if (StringUtils.isBlank(userName)) {
+            model.addAttribute("taskList", resultList);
+            return "holiday::taskList";
         }
         List<Task> taskList = taskService.createTaskQuery()
                 .processDefinitionKey("holiday")
@@ -296,8 +261,8 @@ public class ActivitiHolidayController {
             map.put("processDefinitionId", task.getProcessDefinitionId());
             resultList.add(map);
         });
-        model.addAttribute("taskList",resultList);
-        return "task";
+        model.addAttribute("taskList", resultList);
+        return "task::taskList";
     }
 
     /**
