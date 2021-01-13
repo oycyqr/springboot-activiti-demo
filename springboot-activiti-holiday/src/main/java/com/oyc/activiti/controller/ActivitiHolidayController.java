@@ -174,6 +174,38 @@ public class ActivitiHolidayController {
      * 启动离职申请流程--传入离职申请流程的key
      */
     @ResponseBody
+    @GetMapping("add")
+    @Transactional
+    public ResponseEntity addHoliday(Holiday holiday) {
+        String processDefinitionKey = "holiday";
+        HashMap<String, Object> resultMap = new HashMap<>(8);
+        //保存请假信息
+        holiday.setStartTime(DateUtils.addDays(new Date(), 1));
+        holiday.setEndTime(DateUtils.addDays(new Date(), 4));
+
+        holiday = holidayService.saveOrUpdate(holiday);
+        String businessKey = String.valueOf(holiday.getId());
+
+        // 根据流程定义的key启动一个流程实例
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, businessKey);
+
+        //流程实例信息
+        resultMap.put("id", processInstance.getId());
+        resultMap.put("name", processInstance.getName());
+        resultMap.put("deploymentId", processInstance.getDeploymentId());
+        resultMap.put("processDefinitionId", processInstance.getProcessDefinitionId());
+        resultMap.put("startUserId", processInstance.getStartUserId());
+        resultMap.put("processDefinitionName", processInstance.getProcessDefinitionName());
+        resultMap.put("businessKey", processInstance.getBusinessKey());
+
+        return ResponseEntity.ok(resultMap);
+    }
+
+
+    /**
+     * 启动离职申请流程--传入离职申请流程的key
+     */
+    @ResponseBody
     @GetMapping("start")
     @Transactional
     public ResponseEntity startProcessByKey(@RequestParam(required = false, defaultValue = "holiday") String processDefinitionKey) {

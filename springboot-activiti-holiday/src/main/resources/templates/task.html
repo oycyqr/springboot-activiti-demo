@@ -56,11 +56,11 @@
                 <button class="btn btn-primary btn-md" th:onclick="showInstanceInfo([[${task.get('processInstanceId')}]])">
                     流程详情
                 </button>
-                <button class="btn btn-primary btn-md" th:onclick="showHolidayInfo([[${task.get('businessKey')}]])">
+                <button class="btn btn-info btn-md" th:onclick="showHolidayInfo([[${task.get('businessKey')}]])">
                     假期详情
                 </button>
 
-                <button class="btn btn-primary btn-md" th:onclick="completeTask([[${task.get('id')}]])">
+                <button class="btn btn-success btn-md" th:onclick="completeTask([[${task.get('id')}]])">
                     完成任务
                 </button>
             </td>
